@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sound Profile</title>
+<meta name="theme-color" content="#0f1115">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sound Profile">
+<link rel="manifest" href='data:application/manifest+json,{"name":"Sound Profile","short_name":"Sound","display":"standalone","background_color":"%230f1115","theme_color":"%230f1115","start_url":"./","icons":[{"src":"data:image/svg%2Bxml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 192 192%27%3E%3Crect width=%27192%27 height=%27192%27 rx=%2742%27 fill=%27%230f1115%27/%3E%3Cg fill=%27%23e8552f%27%3E%3Crect x=%2740%27 y=%2778%27 width=%2712%27 height=%2736%27 rx=%276%27/%3E%3Crect x=%2766%27 y=%2754%27 width=%2712%27 height=%2784%27 rx=%276%27/%3E%3Crect x=%2792%27 y=%2734%27 width=%2712%27 height=%27124%27 rx=%276%27/%3E%3Crect x=%27118%27 y=%2762%27 width=%2712%27 height=%2768%27 rx=%276%27/%3E%3Crect x=%27144%27 y=%2786%27 width=%2712%27 height=%2720%27 rx=%276%27/%3E%3C/g%3E%3C/svg%3E","sizes":"192x192","type":"image/svg+xml"}]}'>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='42' fill='%230f1115'/%3E%3Cg fill='%23e8552f'%3E%3Crect x='40' y='78' width='12' height='36' rx='6'/%3E%3Crect x='66' y='54' width='12' height='84' rx='6'/%3E%3Crect x='92' y='34' width='12' height='124' rx='6'/%3E%3Crect x='118' y='62' width='12' height='68' rx='6'/%3E%3Crect x='144' y='86' width='12' height='20' rx='6'/%3E%3C/g%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#0f1115; --surface:#171a21; --surface2:#1e222b; --line:#2b3140;
+  --text:#e7eaf0; --muted:#8d95a5; --accent:#e8552f; --ok:#3fbf7f; --ng:#e0483f;
+  --push:#e8552f; --pull:#5b8dd9;
+  --radius:14px; --tap:52px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
+  font-size:16px; line-height:1.6;
+  padding-bottom:calc(84px + env(safe-area-inset-bottom));
+  overscroll-behavior-y:contain;
+}
+header{
+  position:sticky; top:0; z-index:20; background:rgba(15,17,21,.92);
+  backdrop-filter:blur(12px); border-bottom:1px solid var(--line);
+  padding:calc(10px + env(safe-area-inset-top)) 16px 10px;
+  display:flex; align-items:center; gap:10px;
+}
+header h1{font-size:15px;margin:0;font-weight:600;letter-spacing:.02em;flex:1}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none}
+.dot.on{background:var(--ok)} .dot.err{background:var(--ng)}
+main{padding:16px;max-width:680px;margin:0 auto}
+.view{display:none} .view.active{display:block}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.card h2{font-size:13px;margin:0 0 12px;color:var(--muted);font-weight:600;letter-spacing:.06em}
+label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
+input[type=text],input[type=password],textarea,select{
+  width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--text);
+  border-radius:10px;padding:13px 14px;font-size:16px;font-family:inherit;line-height:1.5;
+}
+textarea{min-height:140px;resize:vertical}
+input:focus,textarea:focus{outline:none;border-color:var(--accent)}
+.field{margin-bottom:14px}
+.hint{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5}
+button{font-family:inherit;font-size:15px;font-weight:600;border:none;border-radius:11px;cursor:pointer}
+.btn{width:100%;min-height:var(--tap);background:var(--accent);color:#fff;margin-top:4px}
+.btn.sub{background:var(--surface2);color:var(--text);border:1px solid var(--line)}
+.btn:disabled{opacity:.45}
+.btn.small{width:auto;min-height:40px;padding:0 16px;font-size:13px}
+.row{display:flex;gap:8px}
+.row>*{flex:1}
+nav{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;
+  background:rgba(15,17,21,.95);backdrop-filter:blur(12px);border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+nav button{flex:1;background:none;color:var(--muted);padding:11px 4px 13px;font-size:11px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:4px}
+nav button.active{color:var(--accent)}
+nav svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.badge{display:inline-block;min-width:18px;padding:0 5px;background:var(--accent);color:#fff;border-radius:9px;font-size:10px;line-height:18px;text-align:center;margin-left:5px;vertical-align:1px}
+.trk{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:10px}
+.trk.done{opacity:.55}
+.trk .ttl{font-size:15px;font-weight:600;line-height:1.35}
+.trk .art{font-size:12.5px;color:var(--muted);margin-top:2px}
+.trk .meta{font-size:11px;color:var(--muted);margin-top:5px;font-variant-numeric:tabular-nums}
+.grp{margin-top:11px}
+.grp .lbl{font-size:10.5px;color:var(--muted);letter-spacing:.06em;margin-bottom:5px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{
+  flex:1;min-width:62px;min-height:44px;background:var(--surface2);color:var(--muted);
+  border:1px solid var(--line);font-size:13.5px;font-weight:600;
+}
+.seg button.sel{color:#fff;border-color:transparent}
+.seg button.sel[data-v="当たり"]{background:var(--ok)}
+.seg button.sel[data-v="外れ"]{background:var(--ng)}
+.seg button.sel[data-v="Push"]{background:var(--push)}
+.seg button.sel[data-v="Pull"]{background:var(--pull)}
+.seg button.sel[data-g="usage"]{background:#4a5263;border-color:#4a5263}
+.seg button.sel[data-m="append"]{background:#4a5263;border-color:#4a5263;color:#fff}
+.seg button.sel[data-m="replace"]{background:var(--ng);border-color:var(--ng);color:#fff}
+.btn.danger{background:var(--ng)}
+.warn{background:rgba(224,72,63,.1);border:1px solid rgba(224,72,63,.35);border-radius:10px;padding:10px 12px;font-size:12.5px;color:#ffb3ae;line-height:1.6;margin-bottom:12px}
+.trk input[type=text]{margin-top:9px;padding:11px 12px;font-size:14px}
+.empty{text-align:center;color:var(--muted);font-size:14px;padding:44px 16px;line-height:1.8}
+.stat{display:flex;justify-content:space-between;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px}
+.stat:last-child{border-bottom:none}
+.stat b{font-size:20px;font-variant-numeric:tabular-nums;font-weight:700}
+.stat .k{color:var(--muted);font-size:13px}
+.pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700}
+.pill.ok{background:rgba(63,191,127,.16);color:var(--ok)}
+.pill.ng{background:rgba(224,72,63,.16);color:var(--ng)}
+.pill.run{background:rgba(232,85,47,.16);color:var(--accent)}
+.savebar{
+  position:fixed;left:0;right:0;bottom:calc(60px + env(safe-area-inset-bottom));z-index:29;
+  padding:10px 16px;background:linear-gradient(transparent,var(--bg) 26%);display:none;
+}
+.savebar.on{display:block}
+.savebar button{max-width:680px;margin:0 auto;display:block;box-shadow:0 6px 22px rgba(0,0,0,.5)}
+#toast{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:calc(126px + env(safe-area-inset-bottom));
+  background:var(--surface2);border:1px solid var(--line);color:var(--text);
+  padding:11px 18px;border-radius:14px;font-size:13.5px;font-weight:600;z-index:60;
+  opacity:0;pointer-events:none;transition:opacity .22s;max-width:88vw;text-align:center;
+  line-height:1.55;white-space:pre-line;
+}
+#toast.on{opacity:1}
+#toast.err{border-color:var(--ng);color:#ffb3ae}
+a{color:var(--accent)}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:s .7s linear infinite;vertical-align:-2px;margin-right:7px}
+@keyframes s{to{transform:rotate(360deg)}}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#f4f5f7;--surface:#fff;--surface2:#eef0f3;--line:#dcdfe6;
+    --text:#1a1d23;--muted:#6b7280;
+  }
+  :root:not([data-theme="dark"]) header,:root:not([data-theme="dark"]) nav{background:rgba(244,245,247,.93)}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="dot" id="conn"></span>
+  <h1>Sound Profile</h1>
+  <button class="btn sub small" id="refresh" style="margin:0">更新</button>
+</header>
+
+<main>
+
+<!-- ============ 曲を追加 ============ -->
+<section class="view" id="v-add">
+  <div class="card">
+    <h2>曲を登録</h2>
+    <div class="grp" style="margin-top:0;margin-bottom:13px">
+      <div class="lbl">モード</div>
+      <div class="seg" id="modeSeg">
+        <button data-m="append" class="sel">追加</button>
+        <button data-m="replace">入れ替え</button>
+      </div>
+    </div>
+    <div class="field">
+      <textarea id="newSongs" placeholder="曲名 - アーティスト名&#10;曲名 - アーティスト名&#10;&#10;1行1曲。改行で複数まとめて登録できる。"></textarea>
+      <div class="hint" id="addHint">—</div>
+    </div>
+    <div class="hint" id="modeNote" style="margin-bottom:12px"></div>
+    <button class="btn" id="addBtn">songs.txt に追加</button>
+    <button class="btn sub" id="addRunBtn" style="margin-top:8px">追加して今すぐ反映</button>
+  </div>
+
+  <div class="card">
+    <h2>現在の songs.txt</h2>
+    <div id="songList" class="hint" style="max-height:260px;overflow:auto;white-space:pre-wrap;font-size:12.5px;line-height:1.85">読み込み中…</div>
+  </div>
+</section>
+
+<!-- ============ 評価 ============ -->
+<section class="view" id="v-eval">
+  <div id="evalList"></div>
+</section>
+
+<!-- ============ 状態 ============ -->
+<section class="view" id="v-status">
+  <div class="card">
+    <h2>データ</h2>
+    <div class="stat"><span class="k">未評価</span><b id="s-pending">–</b></div>
+    <div class="stat"><span class="k">評価済み</span><b id="s-done">–</b></div>
+    <div class="stat"><span class="k">当たり率</span><b id="s-rate">–</b></div>
+    <div class="stat"><span class="k">Push / Pull</span><b id="s-pp">–</b></div>
+  </div>
+
+  <div class="card">
+    <h2>用途別（usage）</h2>
+    <div id="s-usage"></div>
+  </div>
+
+  <div class="card">
+    <h2>直近の実行</h2>
+    <div id="runs" class="hint">読み込み中…</div>
+    <button class="btn sub" id="runBtn" style="margin-top:12px">ワークフローを手動実行</button>
+  </div>
+
+  <div class="card">
+    <h2>外れ曲（除外候補）</h2>
+    <div id="s-miss" class="hint" style="max-height:220px;overflow:auto;white-space:pre-wrap;font-size:12.5px;line-height:1.8"></div>
+  </div>
+
+  <div class="card">
+    <h2>リンク</h2>
+    <div class="hint" id="links"></div>
+  </div>
+</section>
+
+<!-- ============ 設定 ============ -->
+<section class="view" id="v-setup">
+  <div class="card">
+    <h2>接続設定</h2>
+    <div class="field">
+      <label>GitHub リポジトリ（owner/repo）</label>
+      <input type="text" id="cfgRepo" placeholder="reds0827ynwa-beep/sound-profile-system" autocapitalize="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="field">
+      <label>ブランチ</label>
+      <input type="text" id="cfgBranch" placeholder="main" autocapitalize="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="field">
+      <label>ワークフローファイル名</label>
+      <input type="text" id="cfgWf" placeholder="update.yml" autocapitalize="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="field">
+      <label>Spotify プレイリストID（リンク用・任意）</label>
+      <input type="text" id="cfgPl" placeholder="346IisYTbffO4Qo43mxASt" autocapitalize="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="field">
+      <label>Fine-grained personal access token</label>
+      <input type="password" id="cfgTok" placeholder="github_pat_…" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <div class="hint">
+        このトークンは<b>この端末のブラウザ内にのみ</b>保存される。サーバーには送られない。<br>
+        権限は <b>このリポジトリ1つだけ</b> に絞ること：Contents = Read and write / Actions = Read and write。有効期限は90日推奨。
+      </div>
+    </div>
+    <button class="btn" id="saveCfg">保存して接続確認</button>
+    <button class="btn sub" id="clearCfg" style="margin-top:8px">トークンを削除</button>
+  </div>
+  <div class="card">
+    <h2>ホーム画面に追加</h2>
+    <div class="hint">
+      <b>iPhone</b>：Safariで開く → 共有 → 「ホーム画面に追加」<br>
+      <b>Android</b>：Chromeのメニュー → 「アプリをインストール」<br><br>
+      追加後はアドレスバーなしの全画面で起動する。
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div class="savebar" id="savebar">
+  <button class="btn" id="saveEval">評価を保存（<span id="saveCount">0</span>件）</button>
+</div>
+
+<nav>
+  <button data-v="add" class="active">
+    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>追加</span>
+  </button>
+  <button data-v="eval">
+    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+    <span>評価<span class="badge" id="navBadge" style="display:none">0</span></span>
+  </button>
+  <button data-v="status">
+    <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg><span>状態</span>
+  </button>
+  <button data-v="setup">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 008 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    <span>設定</span>
+  </button>
+</nav>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+/* ---------- 設定 ---------- */
+const DEF = { repo:'reds0827ynwa-beep/sound-profile-system', branch:'main', wf:'update.yml', pl:'346IisYTbffO4Qo43mxASt', tok:'' };
+const LS = 'sps.cfg.v1', LSD = 'sps.draft.v1';
+let cfg = {...DEF};
+try { const s = localStorage.getItem(LS); if (s) cfg = {...DEF, ...JSON.parse(s)}; } catch(e){}
+function saveCfg(){ try{ localStorage.setItem(LS, JSON.stringify(cfg)); }catch(e){} }
+
+/* ---------- 状態 ---------- */
+let rows = [], header = [], csvSha = null, songsTxt = '', songsSha = null;
+let draft = {};
+try { const d = localStorage.getItem(LSD); if (d) draft = JSON.parse(d); } catch(e){}
+function saveDraft(){ try{ localStorage.setItem(LSD, JSON.stringify(draft)); }catch(e){} }
+
+/* ---------- ユーティリティ ---------- */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s??'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+let toastT;
+function toast(msg, isErr){
+  const t = $('#toast');
+  t.textContent = msg; t.className = 'on' + (isErr ? ' err' : '');
+  clearTimeout(toastT);
+  toastT = setTimeout(()=>{ t.className = ''; }, isErr ? 5200 : 2600);
+}
+
+function b64enc(str){
+  const b = new TextEncoder().encode(str);
+  let s = '';
+  for (let i=0;i<b.length;i+=0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i+0x8000));
+  return btoa(s);
+}
+function b64dec(b64){
+  const bin = atob(String(b64).replace(/\s/g,''));
+  const b = new Uint8Array(bin.length);
+  for (let i=0;i<bin.length;i++) b[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(b);
+}
+
+/* ---------- CSV ---------- */
+function csvParse(text){
+  const out = []; let row = [], f = '', q = false;
+  text = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+  for (let i=0;i<text.length;i++){
+    const c = text[i];
+    if (q){
+      if (c === '"'){ if (text[i+1] === '"'){ f += '"'; i++; } else q = false; }
+      else f += c;
+    } else {
+      if (c === '"') q = true;
+      else if (c === ','){ row.push(f); f=''; }
+      else if (c === '\n'){ row.push(f); out.push(row); row=[]; f=''; }
+      else f += c;
+    }
+  }
+  if (f !== '' || row.length) { row.push(f); out.push(row); }
+  return out.filter(r => r.length > 1 || (r[0]||'').trim() !== '');
+}
+function csvCell(v){
+  v = String(v ?? '');
+  return /[",\n]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v;
+}
+function csvBuild(head, data){
+  return [head.map(csvCell).join(','), ...data.map(r => head.map((_,i)=>csvCell(r[i])).join(','))].join('\n') + '\n';
+}
+
+/* ---------- GitHub API ---------- */
+async function gh(path, opts){
+  opts = opts || {};
+  if (!cfg.tok) throw new Error('トークン未設定');
+  const res = await fetch('https://api.github.com' + path, {
+    method: opts.method || 'GET',
+    headers: {
+      'Authorization': 'Bearer ' + cfg.tok,
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      ...(opts.body ? {'Content-Type':'application/json'} : {})
+    },
+    body: opts.body ? JSON.stringify(opts.body) : undefined,
+    cache: 'no-store'
+  });
+  if (res.status === 204) return null;
+  let j = null;
+  try { j = await res.json(); } catch(e){}
+  if (!res.ok){
+    const e = new Error((j && j.message) || ('HTTP ' + res.status));
+    e.status = res.status; e.body = j;
+    throw e;
+  }
+  return j;
+}
+const api = p => '/repos/' + cfg.repo + p;
+
+async function getFile(path){
+  try {
+    const j = await gh(api('/contents/' + encodeURIComponent(path) + '?ref=' + encodeURIComponent(cfg.branch) + '&t=' + Date.now()));
+    return { text: b64dec(j.content), sha: j.sha };
+  } catch(e){
+    if (e.status === 404) return { text:'', sha:null };
+    throw e;
+  }
+}
+async function putFile(path, text, sha, msg){
+  const body = { message: msg, content: b64enc(text), branch: cfg.branch };
+  if (sha) body.sha = sha;
+  const j = await gh(api('/contents/' + encodeURIComponent(path)), { method:'PUT', body });
+  return j.content.sha;
+}
+
+/* ---------- 読み込み ---------- */
+function idx(name){ return header.indexOf(name); }
+function keyOf(r){
+  return [r[idx('date')]||'', r[idx('input_title')]||'', r[idx('input_artist')]||''].join('');
+}
+
+async function loadAll(silent){
+  if (!cfg.tok || !cfg.repo){ $('#conn').className = 'dot'; show('setup'); return; }
+  if (!silent) toast('読み込み中…');
+  try {
+    const [csv, songs] = await Promise.all([ getFile('feedback_log.csv'), getFile('songs.txt') ]);
+    csvSha = csv.sha; songsSha = songs.sha; songsTxt = songs.text;
+
+    const parsed = csvParse(csv.text);
+    if (parsed.length){ header = parsed[0].map(s=>s.trim()); rows = parsed.slice(1); }
+    else { header = ['date','input_title','input_artist','spotify_title','spotify_artist','strategy','score','verdict','pressure_type','usage','memo']; rows = []; }
+
+    $('#conn').className = 'dot on';
+    renderAll();
+    if (!silent) toast('最新を取得');
+    loadRuns();
+  } catch(e){
+    $('#conn').className = 'dot err';
+    toast(errMsg(e), true);
+  }
+}
+
+function errMsg(e){
+  if (e.status === 401) return '認証エラー：トークンを確認';
+  if (e.status === 403) return '権限不足：トークンのスコープを確認';
+  if (e.status === 404) return 'リポジトリ/ファイルが見つからない';
+  if (e.status === 409 || e.status === 422) return '競合：更新してからやり直し';
+  return e.message || '通信エラー';
+}
+
+/* ---------- 描画 ---------- */
+function renderAll(){ renderSongs(); renderEval(); renderStatus(); renderSaveBar(); }
+
+function renderSongs(){
+  const lines = songsTxt.split('\n').map(s=>s.trim()).filter(s => s && !s.startsWith('#'));
+  $('#songList').textContent = lines.length ? lines.map((l,i)=>(i+1)+'. '+l).join('\n') : '（空）';
+  previewInput();
+}
+
+const V_VERDICT = ['当たり','外れ'];
+const V_PRESSURE = ['Push','Pull'];
+const V_USAGE = ['weld','desk','think','ng'];
+
+function renderEval(){
+  const showDone = $('#evalList').dataset.showDone === '1';
+  const vi = idx('verdict');
+  let list = rows.map((r,i)=>({r,i})).filter(o => showDone ? true : !String(o.r[vi]||'').trim());
+  list.reverse();
+
+  const pending = rows.filter(r => !String(r[vi]||'').trim()).length;
+  const b = $('#navBadge');
+  b.textContent = pending; b.style.display = pending ? 'inline-block' : 'none';
+
+  if (!list.length){
+    $('#evalList').innerHTML = '<div class="empty">未評価の曲はない。<br>プレイリストを聴いたらここに戻る。<br><br>'
+      + '<button class="btn sub small" id="toggleDone">' + (showDone ? '未評価のみ' : '評価済みも表示') + '</button></div>';
+    bindToggle();
+    return;
+  }
+
+  const ti=idx('spotify_title'), ta=idx('spotify_artist'), it=idx('input_title'), ia=idx('input_artist'),
+        st=idx('strategy'), sc=idx('score'), pi=idx('pressure_type'), ui=idx('usage'), mi=idx('memo'), di=idx('date');
+
+  let html = '<div style="text-align:right;margin-bottom:10px"><button class="btn sub small" id="toggleDone">'
+    + (showDone ? '未評価のみ' : '評価済みも表示') + '</button></div>';
+
+  for (const {r,i} of list){
+    const k = keyOf(r);
+    const d = draft[k] || {};
+    const cur = f => d[f] !== undefined ? d[f] : (r[idx(f)] || '');
+    const title = (r[ti] || r[it] || '(不明)');
+    const artist = (r[ta] || r[ia] || '');
+    const skipped = String(r[st]||'') === 'skipped';
+    const done = !!String(r[idx('verdict')]||'').trim() && !d.verdict;
+
+    html += '<div class="trk' + (done ? ' done' : '') + '" data-k="' + esc(k) + '">'
+      + '<div class="ttl">' + esc(title) + '</div>'
+      + '<div class="art">' + esc(artist) + (skipped ? ' ・<span style="color:var(--ng)">未検出</span>' : '') + '</div>'
+      + '<div class="meta">' + esc((r[di]||'').slice(0,16)) + (r[sc] ? ' ・score ' + esc(r[sc]) : '') + '</div>'
+      + seg('verdict', V_VERDICT, cur('verdict'))
+      + seg('pressure_type', V_PRESSURE, cur('pressure_type'))
+      + seg('usage', V_USAGE, cur('usage'))
+      + '<input type="text" data-f="memo" placeholder="一言理由（任意）" value="' + esc(cur('memo')) + '">'
+      + '</div>';
+  }
+  $('#evalList').innerHTML = html;
+  bindToggle();
+}
+
+function seg(field, vals, cur){
+  const lbl = {verdict:'判定', pressure_type:'圧', usage:'用途'}[field];
+  return '<div class="grp"><div class="lbl">' + lbl + '</div><div class="seg" data-f="' + field + '">'
+    + vals.map(v => '<button data-v="' + esc(v) + '" data-g="' + field + '" class="' + (cur === v ? 'sel' : '') + '">' + esc(v) + '</button>').join('')
+    + '</div></div>';
+}
+function bindToggle(){
+  const t = $('#toggleDone');
+  if (t) t.onclick = () => {
+    const el = $('#evalList');
+    el.dataset.showDone = el.dataset.showDone === '1' ? '0' : '1';
+    renderEval();
+  };
+}
+
+$('#evalList').addEventListener('click', e => {
+  const btn = e.target.closest('.seg button');
+  if (!btn) return;
+  const trk = btn.closest('.trk'), k = trk.dataset.k, f = btn.parentElement.dataset.f, v = btn.dataset.v;
+  draft[k] = draft[k] || {};
+  if (draft[k][f] === v){ delete draft[k][f]; btn.classList.remove('sel'); }
+  else { draft[k][f] = v; [...btn.parentElement.children].forEach(b => b.classList.remove('sel')); btn.classList.add('sel'); }
+  if (!Object.keys(draft[k]).length) delete draft[k];
+  saveDraft(); renderSaveBar();
+});
+$('#evalList').addEventListener('input', e => {
+  const inp = e.target.closest('input[data-f="memo"]');
+  if (!inp) return;
+  const k = inp.closest('.trk').dataset.k;
+  draft[k] = draft[k] || {};
+  if (inp.value) draft[k].memo = inp.value; else delete draft[k].memo;
+  if (!Object.keys(draft[k]).length) delete draft[k];
+  saveDraft(); renderSaveBar();
+});
+
+function renderSaveBar(){
+  const n = Object.keys(draft).length;
+  $('#saveCount').textContent = n;
+  $('#savebar').className = 'savebar' + (n && $('#v-eval').classList.contains('active') ? ' on' : '');
+}
+
+function renderStatus(){
+  const vi=idx('verdict'), pi=idx('pressure_type'), ui=idx('usage'), ti=idx('spotify_title'), ta=idx('spotify_artist'), it=idx('input_title');
+  const done = rows.filter(r => String(r[vi]||'').trim());
+  const hit = done.filter(r => r[vi] === '当たり').length;
+  $('#s-pending').textContent = rows.length - done.length;
+  $('#s-done').textContent = done.length;
+  $('#s-rate').textContent = done.length ? Math.round(hit/done.length*100) + '%' : '–';
+  const push = rows.filter(r=>r[pi]==='Push').length, pull = rows.filter(r=>r[pi]==='Pull').length;
+  $('#s-pp').textContent = (push+pull) ? push + ' / ' + pull : '–';
+
+  const counts = {};
+  rows.forEach(r => { const u = String(r[ui]||'').trim(); if (u) counts[u] = (counts[u]||0)+1; });
+  const keys = Object.keys(counts);
+  $('#s-usage').innerHTML = keys.length
+    ? keys.sort((a,b)=>counts[b]-counts[a]).map(k => '<div class="stat"><span class="k">'+esc(k)+'</span><b>'+counts[k]+'</b></div>').join('')
+    : '<div class="hint">まだデータなし</div>';
+
+  const miss = rows.filter(r => r[vi] === '外れ').map(r => (r[ti]||r[it]||'') + ' - ' + (r[ta]||''));
+  $('#s-miss').textContent = miss.length ? miss.join('\n') : '（なし）';
+
+  const rp = 'https://github.com/' + cfg.repo;
+  $('#links').innerHTML =
+    (cfg.pl ? '<a href="https://open.spotify.com/playlist/' + esc(cfg.pl) + '">Spotifyで開く</a><br>' : '')
+    + '<a href="' + esc(rp) + '/actions">Actions（実行ログ）</a><br>'
+    + '<a href="' + esc(rp) + '/blob/' + esc(cfg.branch) + '/feedback_log.csv">feedback_log.csv</a>';
+}
+
+async function loadRuns(){
+  try {
+    const j = await gh(api('/actions/runs?per_page=5'));
+    const runs = (j && j.workflow_runs) || [];
+    if (!runs.length){ $('#runs').textContent = '実行履歴なし'; return; }
+    $('#runs').innerHTML = runs.map(r => {
+      const running = r.status !== 'completed';
+      const cls = running ? 'run' : (r.conclusion === 'success' ? 'ok' : 'ng');
+      const txt = running ? '実行中' : (r.conclusion === 'success' ? '成功' : '失敗');
+      const t = new Date(r.created_at).toLocaleString('ja-JP', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+      return '<div class="stat"><span class="k">' + esc(t) + '</span><span class="pill ' + cls + '">' + txt + '</span></div>';
+    }).join('');
+  } catch(e){ $('#runs').textContent = '取得不可（Actions権限を確認）'; }
+}
+
+/* ---------- 曲登録（追加／入れ替え） ---------- */
+let mode = 'append', armed = false, armTimer = null;
+
+function curCount(){ return songsTxt.split('\n').map(s=>s.trim()).filter(s=>s && !s.startsWith('#')).length; }
+
+function renderMode(){
+  const rep = mode === 'replace';
+  $('#addBtn').className = 'btn' + (rep ? ' danger' : '');
+  if (!armed){
+    $('#addBtn').textContent = rep ? 'songs.txt を入れ替え' : 'songs.txt に追加';
+    $('#addRunBtn').textContent = rep ? '入れ替えて今すぐ反映' : '追加して今すぐ反映';
+  }
+  $('#modeNote').innerHTML = rep
+    ? '<div class="warn"><b>入れ替え</b>：songs.txt を入力した曲だけにする。プレイリストもその曲だけになる。<br>'
+      + '入れ替え前のリストは <b>songs_history.txt</b> に日付付きで自動保存されるので、消えてしまうことはない。</div>'
+    : '既存のリストに足す。プレイリストは曲数が増えていく。';
+}
+
+function disarm(){
+  armed = false; clearTimeout(armTimer);
+  renderMode();
+}
+
+/* 入力行の自動整形：行頭の番号・箇条書き、区切りダッシュ、全角記号を吸収 */
+function normLine(s){
+  let t = String(s == null ? '' : s).replace(/　/g, ' ').trim();
+  if (!t || t.startsWith('#')) return '';
+  t = t.replace(/^(?:\d+\s*[.)．、:：]\s*|[*>+]\s+|[-–—]\s+|[・･]\s*)/, '');   // 1. / 1) / - / ・
+  t = t.replace(/([)）\]】」』])\s*[-–—―ー]\s*/g, '$1 - ');                    // ）- → ） -␣
+  t = t.replace(/\s+[-–—―]\s+/g, ' - ');                                       // ダッシュ各種を統一
+  t = t.replace(/[’‘`]/g, "'").replace(/[”“]/g, '"');                          // 全角クォート
+  return t.replace(/\s{2,}/g, ' ').trim();
+}
+
+function parseInput(){
+  const out = { items: [], fixed: 0, bad: [] };
+  $('#newSongs').value.split('\n').forEach((l, i) => {
+    const t = normLine(l);
+    if (!t) return;
+    if (t !== l.trim()) out.fixed++;
+    if (!t.includes(' - ')) out.bad.push({ no: i + 1, text: t });
+    out.items.push(t);
+  });
+  return out;
+}
+
+function previewInput(){
+  const p = parseInput();
+  const base = '登録 ' + curCount() + ' 曲';
+  $('#addHint').textContent = p.items.length
+    ? p.items.length + '曲を認識'
+      + (p.fixed ? '（' + p.fixed + '行を自動整形）' : '')
+      + (p.bad.length ? ' ／ 区切り不正 ' + p.bad.length + '行' : '')
+      + ' ・ ' + base
+    : base;
+}
+
+async function addSongs(alsoRun){
+  const p = parseInput();
+  if (!p.items.length){ toast('曲が入力されていない', true); return; }
+  if (p.bad.length){
+    const head = p.bad.slice(0, 3).map(o => o.no + '行目「' + o.text.slice(0, 22) + '」').join('\n');
+    toast('区切りが不正（曲名 - アーティスト名）\n' + head + (p.bad.length > 3 ? '\n他' + (p.bad.length - 3) + '件' : ''), true);
+    return;
+  }
+
+  // 入力内自体の重複を除去（順序は保持）
+  const seen = new Set(), raw = [];
+  for (const l of p.items){ const k = l.toLowerCase(); if (!seen.has(k)){ seen.add(k); raw.push(l); } }
+
+  // 入れ替えは2段階確認
+  if (mode === 'replace' && !armed){
+    armed = true;
+    const t = 'もう一度押すと ' + curCount() + '曲 → ' + raw.length + '曲 に入れ替え';
+    $('#addBtn').textContent = t;
+    $('#addRunBtn').textContent = t;
+    clearTimeout(armTimer);
+    armTimer = setTimeout(disarm, 8000);
+    return;
+  }
+
+  const btns = [$('#addBtn'), $('#addRunBtn')];
+  const active = alsoRun ? $('#addRunBtn') : $('#addBtn');
+  btns.forEach(b => b.disabled = true);
+  active.innerHTML = '<span class="spin"></span>送信中';
+
+  try {
+    const fresh = await getFile('songs.txt');
+    let next, msg, n;
+
+    if (mode === 'replace'){
+      const old = fresh.text.replace(/\s*$/, '');
+      if (old){
+        const hist = await getFile('songs_history.txt');
+        const stamp = new Date().toLocaleString('ja-JP', {year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+        const oldN = old.split('\n').map(s=>s.trim()).filter(s=>s && !s.startsWith('#')).length;
+        const block = '# ' + stamp + ' 入れ替え前（' + oldN + '曲）\n' + old + '\n';
+        const base = hist.text.replace(/\s*$/, '');
+        await putFile('songs_history.txt', (base ? base + '\n\n' : '') + block, hist.sha, 'backup songs.txt before replace');
+      }
+      next = raw.join('\n') + '\n';
+      n = raw.length;
+      msg = 'replace songs.txt (' + n + ' tracks) via app';
+    } else {
+      const exist = new Set(fresh.text.split('\n').map(s => s.trim().toLowerCase()).filter(Boolean));
+      const add = raw.filter(l => !exist.has(l.toLowerCase()));
+      if (!add.length){ toast('すべて登録済み'); $('#newSongs').value = ''; return; }
+      const base = fresh.text.replace(/\s*$/, '');
+      next = (base ? base + '\n' : '') + add.join('\n') + '\n';
+      n = add.length;
+      msg = 'add ' + n + ' track(s) via app';
+    }
+
+    songsSha = await putFile('songs.txt', next, fresh.sha, msg);
+    songsTxt = next;
+    $('#newSongs').value = '';
+    renderSongs();
+
+    if (mode === 'replace') toast(n + '曲に入れ替えた' + (alsoRun ? '' : '。2分ほどで反映される'));
+    else toast(n + '曲を追加' + (raw.length > n ? '（重複' + (raw.length-n) + '件は除外）' : '') + (alsoRun ? '' : '。2分ほどで反映される'));
+
+    if (alsoRun) await dispatch(true);
+  } catch(e){
+    toast(errMsg(e), true);
+  } finally {
+    btns.forEach(b => b.disabled = false);
+    disarm();
+  }
+}
+
+$('#modeSeg').addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  mode = b.dataset.m;
+  [...b.parentElement.children].forEach(x => x.classList.remove('sel'));
+  b.classList.add('sel');
+  disarm();
+});
+$('#newSongs').addEventListener('input', () => { if (armed) disarm(); previewInput(); });
+
+async function dispatch(quiet){
+  try {
+    await gh(api('/actions/workflows/' + encodeURIComponent(cfg.wf) + '/dispatches'), { method:'POST', body:{ ref: cfg.branch } });
+    toast('ワークフローを実行した');
+    setTimeout(loadRuns, 4000);
+  } catch(e){
+    toast('実行失敗：' + errMsg(e), true);
+  }
+}
+
+/* ---------- 評価保存（botのcommitと競合しないようマージして書く） ---------- */
+async function saveEval(){
+  const keys = Object.keys(draft);
+  if (!keys.length) return;
+  const btn = $('#saveEval'); btn.disabled = true;
+  const orig = btn.innerHTML; btn.innerHTML = '<span class="spin"></span>保存中';
+
+  try {
+    for (let attempt = 0; attempt < 3; attempt++){
+      const fresh = await getFile('feedback_log.csv');
+      const parsed = csvParse(fresh.text);
+      if (!parsed.length) throw new Error('feedback_log.csv が空');
+      const h = parsed[0].map(s=>s.trim());
+      const data = parsed.slice(1);
+      const ix = n => h.indexOf(n);
+      const kf = r => [r[ix('date')]||'', r[ix('input_title')]||'', r[ix('input_artist')]||''].join('');
+
+      let applied = 0;
+      for (const r of data){
+        const d = draft[kf(r)];
+        if (!d) continue;
+        for (const f of ['verdict','pressure_type','usage','memo']){
+          if (d[f] !== undefined && ix(f) >= 0) r[ix(f)] = d[f];
+        }
+        applied++;
+      }
+      if (!applied) throw new Error('対象行が見つからない（更新してやり直し）');
+
+      try {
+        csvSha = await putFile('feedback_log.csv', csvBuild(h, data), fresh.sha, 'eval: ' + applied + ' row(s) via app');
+        header = h; rows = data;
+        draft = {}; saveDraft();
+        renderAll();
+        toast(applied + '件を保存');
+        return;
+      } catch(e){
+        if ((e.status === 409 || e.status === 422) && attempt < 2){ await new Promise(r=>setTimeout(r, 900)); continue; }
+        throw e;
+      }
+    }
+  } catch(e){
+    toast(errMsg(e), true);
+  } finally {
+    btn.disabled = false; btn.innerHTML = orig;
+  }
+}
+
+/* ---------- ナビ ---------- */
+function show(v){
+  $$('.view').forEach(s => s.classList.toggle('active', s.id === 'v-' + v));
+  $$('nav button').forEach(b => b.classList.toggle('active', b.dataset.v === v));
+  renderSaveBar();
+  window.scrollTo(0,0);
+}
+$$('nav button').forEach(b => b.onclick = () => show(b.dataset.v));
+
+/* ---------- 設定画面 ---------- */
+function fillCfg(){
+  $('#cfgRepo').value = cfg.repo; $('#cfgBranch').value = cfg.branch;
+  $('#cfgWf').value = cfg.wf; $('#cfgPl').value = cfg.pl; $('#cfgTok').value = cfg.tok;
+}
+$('#saveCfg').onclick = async () => {
+  cfg.repo = $('#cfgRepo').value.trim().replace(/^https?:\/\/github\.com\//,'').replace(/\/$/,'');
+  cfg.branch = $('#cfgBranch').value.trim() || 'main';
+  cfg.wf = $('#cfgWf').value.trim() || 'update.yml';
+  cfg.pl = $('#cfgPl').value.trim();
+  cfg.tok = $('#cfgTok').value.trim();
+  saveCfg();
+  await loadAll();
+  if ($('#conn').classList.contains('on')) show('add');
+};
+$('#clearCfg').onclick = () => {
+  cfg.tok = ''; saveCfg(); fillCfg();
+  $('#conn').className = 'dot';
+  toast('トークンを削除した');
+};
+
+$('#addBtn').onclick = () => addSongs(false);
+$('#addRunBtn').onclick = () => addSongs(true);
+$('#runBtn').onclick = () => dispatch();
+$('#saveEval').onclick = saveEval;
+$('#refresh').onclick = () => loadAll();
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && cfg.tok && $('#conn').classList.contains('on')) loadAll(true);
+});
+
+/* ---------- 起動 ---------- */
+fillCfg();
+renderMode();
+previewInput();
+if (cfg.tok && cfg.repo){ show('add'); loadAll(); } else { show('setup'); }
+</script>
+</body>
+</html>
